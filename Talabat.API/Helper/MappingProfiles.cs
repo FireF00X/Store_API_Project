@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Talabat.API.DTOs;
 using Talabat.Core.Entities;
+using Talabat.Core.Entities.BasketEntities;
 
 namespace Talabat.API.Helper
 {
@@ -12,6 +13,8 @@ namespace Talabat.API.Helper
                 .ForMember(d=>d.ProductBrand,o=>o.MapFrom(s=>s.ProductBrand.Name))
                 .ForMember(d=>d.ProductType,o=>o.MapFrom(s=>s.ProductType.Name))
                 .ForMember(d=>d.PictureUrl,o=>o.MapFrom<ProductPictureUrlResolver>());
+            CreateMap<BasketItemsDto, BasketItems>();
+            CreateMap<CustomerBasketDto, CustomerBasket>();
         }
     }
 }
