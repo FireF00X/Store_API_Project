@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -5,8 +6,10 @@ using System.Net;
 using Talabat.API.CustomMiddleware;
 using Talabat.API.Errors;
 using Talabat.API.Helper;
+using Talabat.Core.Entities.IdentityEntities;
 using Talabat.Core.RepositoryInterfaces;
 using Talabat.Repository.Data;
+using Talabat.Repository.Data.IdentityData;
 using Talabat.Repository.RepositoryLogics;
 
 namespace Talabat.API
@@ -27,6 +30,10 @@ namespace Talabat.API
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+            builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
             builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
             {
                 var connection = builder.Configuration.GetConnectionString("Redis");
@@ -34,6 +41,7 @@ namespace Talabat.API
             });
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
             builder.Services.AddScoped<IRedisRepository, RedisRepository>();
+            builder.Services.AddIdentity<AppUser, IdentityRole>(options => { }).AddEntityFrameworkStores<AppIdentityDbContext>();
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -57,11 +65,15 @@ namespace Talabat.API
             var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
             var _dbContext = services.GetRequiredService<TalabatDbContext>();
+            var _identityContext = services.GetRequiredService<AppIdentityDbContext>();
+            var _userManger = services.GetRequiredService<UserManager<AppUser>>();
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
             try
             {
                 await _dbContext.Database.MigrateAsync();
                 await StoreContextSeed.SeedAsync(_dbContext);
+                await _identityContext.Database.MigrateAsync();
+                await StoreIdentityContextSeed.SeedIdentityAsync(_userManger, _identityContext);
             }
             catch (Exception ex)
             {
