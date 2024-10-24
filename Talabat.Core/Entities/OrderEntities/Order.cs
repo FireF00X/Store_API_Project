@@ -8,10 +8,9 @@ namespace Talabat.Core.Entities.OrderEntities
 {
     public class Order : BaseModel
     {
-        public Order(string buyerEmail, OrderStatus status, OrderAddress shippingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> items, decimal subTotal)
+        public Order(string buyerEmail,  OrderAddress shippingAddress, DeliveryMethod deliveryMethod, ICollection<OrderItem> items, decimal subTotal)
         {
             BuyerEmail = buyerEmail;
-            Status = status;
             ShippingAddress = shippingAddress;
             DeliveryMethod = deliveryMethod;
             Items = items;
@@ -32,7 +31,7 @@ namespace Talabat.Core.Entities.OrderEntities
         public decimal SubTotal { get; set; }
         public decimal GetTotal()
             => SubTotal+DeliveryMethod.Cost;
-        public string PaymentIntentId { get; set; }
+        public string PaymentIntentId { get; set; } = string.Empty;
 
     }
 }

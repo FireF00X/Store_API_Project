@@ -20,6 +20,15 @@ namespace Talabat.Repository.RepositoryLogics
             _dbContext = dbContext;
         }
 
+        public async Task<T> AddAsync(T item)
+        { 
+            await _dbContext.AddAsync(item); 
+            return item;
+        }
+
+        public void Delete(T item)
+        => _dbContext.Remove(item);
+
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
             if(typeof(T) == typeof(Product))
@@ -58,5 +67,8 @@ namespace Talabat.Repository.RepositoryLogics
         {
             return await SpecificationsEvaluator<T>.GetQuery(_dbContext.Set<T>(), spec).CountAsync();
         }
+
+        public  void update(T item)
+        =>  _dbContext.Update(item);
     }
 }

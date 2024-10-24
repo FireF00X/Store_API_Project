@@ -8,9 +8,11 @@ using Talabat.API.Errors;
 using Talabat.API.Helper;
 using Talabat.Core.Entities.IdentityEntities;
 using Talabat.Core.RepositoryInterfaces;
+using Talabat.Core.ServicesInterfaces;
 using Talabat.Repository.Data;
 using Talabat.Repository.Data.IdentityData;
 using Talabat.Repository.RepositoryLogics;
+using Talabat.Service;
 
 namespace Talabat.API
 {
@@ -39,7 +41,8 @@ namespace Talabat.API
                 var connection = builder.Configuration.GetConnectionString("Redis");
                 return ConnectionMultiplexer.Connect(connection);
             });
-            builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
+            builder.Services.AddScoped(typeof(IUnitOfWork),typeof(UnitOfWork));
+            builder.Services.AddScoped<IOrderingService, OrderingService>();
             builder.Services.AddScoped<IRedisRepository, RedisRepository>();
             builder.Services.AddIdentity<AppUser, IdentityRole>(options => { }).AddEntityFrameworkStores<AppIdentityDbContext>();
             builder.Services.AddAutoMapper(typeof(MappingProfiles));

@@ -57,9 +57,10 @@ namespace Talabat.Repository.Data
                 }
             }
             #endregion
+            #region Delivery Methods
             var deliveryData = File.ReadAllText("../Talabat.Repository/Data/DataSeeding/delivery.json");
             var deliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryData);
-            if(deliveryMethods.Count() > 0)
+            if (deliveryMethods.Count() > 0)
             {
                 if (_dbContext.DeliveryMethods.Count() == 0)
                 {
@@ -68,7 +69,8 @@ namespace Talabat.Repository.Data
                         await _dbContext.Set<DeliveryMethod>().AddAsync(deliveryMethod);
                     }
                 }
-            }
+            } 
+            #endregion
             await _dbContext.SaveChangesAsync();
         }
     }
