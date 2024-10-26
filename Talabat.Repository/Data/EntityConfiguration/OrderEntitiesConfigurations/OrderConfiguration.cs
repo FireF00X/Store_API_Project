@@ -15,7 +15,7 @@ namespace Talabat.Repository.Data.EntityConfiguration.OrderEntitiesConfiguration
         {
             builder.Property(o=>o.Status)
                     .HasConversion(s=>s.ToString()
-                    ,s=> (OrderStatus) Enum.Parse(typeof(Order),s));
+                    ,s=> (OrderStatus) Enum.Parse(typeof(OrderStatus),s));
 
             builder.OwnsOne(o => o.ShippingAddress, a => a.WithOwner());
 

@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System.Net;
+using System.Text;
 using Talabat.API.CustomMiddleware;
 using Talabat.API.Errors;
 using Talabat.API.Helper;
@@ -41,7 +44,24 @@ namespace Talabat.API
                 var connection = builder.Configuration.GetConnectionString("Redis");
                 return ConnectionMultiplexer.Connect(connection);
             });
+            builder.Services.AddAuthentication().AddJwtBearer("Bearer",
+                options => 
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecurityKey"]?? string.Empty)),
+                        ClockSkew = TimeSpan.Zero,
+                        ValidAudience= builder.Configuration.GetSection("JWT").GetSection("ValidAud").Value,
+                        ValidIssuer = builder.Configuration["JWT:ValidIss"],
+                    };
+                }            
+            );
             builder.Services.AddScoped(typeof(IUnitOfWork),typeof(UnitOfWork));
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IOrderingService, OrderingService>();
             builder.Services.AddScoped<IRedisRepository, RedisRepository>();
             builder.Services.AddIdentity<AppUser, IdentityRole>(options => { }).AddEntityFrameworkStores<AppIdentityDbContext>();
