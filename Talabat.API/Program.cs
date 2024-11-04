@@ -64,6 +64,7 @@ namespace Talabat.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IOrderingService, OrderingService>();
             builder.Services.AddScoped<IRedisRepository, RedisRepository>();
+            builder.Services.AddScoped<IPaymentService,PaymentService>();
             builder.Services.AddIdentity<AppUser, IdentityRole>(options => { }).AddEntityFrameworkStores<AppIdentityDbContext>();
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
             builder.Services.Configure<ApiBehaviorOptions>(options =>

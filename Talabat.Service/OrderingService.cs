@@ -17,11 +17,13 @@ namespace Talabat.Service
     {
         private readonly IRedisRepository _customerBasket;
         private readonly IUnitOfWork _repo;
+        private readonly IPaymentService _paymentService;
 
-        public OrderingService(IRedisRepository customerBasket, IUnitOfWork repo)
+        public OrderingService(IRedisRepository customerBasket, IUnitOfWork repo,IPaymentService paymentService)
         {
             _customerBasket = customerBasket;
             _repo = repo;
+            _paymentService = paymentService;
         }
         public async Task<Order?> CreateOrderAsync(string basketId, string buyerEmail, int deliveryMethodId, OrderAddress orderAddress)
         {
@@ -45,7 +47,13 @@ namespace Talabat.Service
             var deliveryMethodChosen = await _repo.CreateRepo<DeliveryMethod>().GetByIdAsync(deliveryMethodId);
 
             // 5. Create Order and add to db
-            var order = new Order(buyerEmail,orderAddress,deliveryMethodChosen,orderItems,subTotal);
+            var exOrderWithSameIntentId = await _repo.CreateRepo<Order>().GetByIdWithSpecAsync(new OrderWithPaymentIntentId(customerBasket.PaymentIntentId));
+            if(exOrderWithSameIntentId != null)
+            {
+                _repo.CreateRepo<Order>().Delete(exOrderWithSameIntentId);
+                await _paymentService.CreateOrUpdatePaymentIntentAsync(customerBasket.Id);
+            }
+            var order = new Order(buyerEmail,orderAddress,deliveryMethodChosen,orderItems,subTotal,customerBasket.PaymentIntentId);
             await _repo.CreateRepo<Order>().AddAsync(order);
 
             // 6. Save Changes 

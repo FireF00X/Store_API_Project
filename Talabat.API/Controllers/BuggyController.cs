@@ -23,12 +23,13 @@ namespace Talabat.API.Controllers
             return Ok(product);
         }
         [HttpGet("BadReq/{id}")]
-        public ActionResult BadReq(int id) // {{BaseUrl}}/api/Buggy/BadReq/five
+        public ActionResult BadReq([FromRoute]int id) // {{BaseUrl}}/api/Buggy/BadReq/five
         {
-            var product = _dbContext.Products.Find(id);
-            if (product == null)
-                return NotFound(new ApiResponse(400));
-            return Ok(product);
+            //var product = _dbContext.Products.Find(id);
+            //if (product == null)
+            //    return NotFound(new ApiResponse(400));
+            //return Ok(product);
+            return Ok();
         }
         [HttpGet("NullReference")]
         public ActionResult NullReference()// {{BaseUrl}}/api/Buggy/NullReference
