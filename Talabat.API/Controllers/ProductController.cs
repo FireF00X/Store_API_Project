@@ -34,6 +34,7 @@ namespace Talabat.API.Controllers
         [ProducesResponseType(typeof(ProductDto),StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
         [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
+        [CashedAttribute(300)]
         public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetAllProducts([FromQuery]ProductSpecsParams specs)
         {
             var products = await _repo.CreateRepo<Product>().GetAllWithSpecAsync(new ProductWithBrandAndTypeSpecs(specs));

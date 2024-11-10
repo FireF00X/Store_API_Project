@@ -44,6 +44,7 @@ namespace Talabat.API
                 var connection = builder.Configuration.GetConnectionString("Redis");
                 return ConnectionMultiplexer.Connect(connection);
             });
+            builder.Services.AddSingleton<ICashService,CashService>();
             builder.Services.AddAuthentication().AddJwtBearer("Bearer",
                 options => 
                 {
